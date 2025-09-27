@@ -16,15 +16,7 @@ class Products(model.Model):
 
     def __str__(self):
         return self.name
-
-# Signal to create auth token when a new user is created
-@receiver(post_save, sender='website.AuthUser')
-def create_auth_user_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        from rest_framework.authtoken.models import Token
-        Token.objects.create(user=instance)
-
-
+    
 class AuthUser(AbstractUser):
     email = model.EmailField(unique=True)
     user_permissions = None  # Disable user permissions field
@@ -34,6 +26,16 @@ class AuthUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+# Signal to create auth token when a new user is created
+@receiver(post_save, sender=AuthUser)
+def create_auth_user_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        from rest_framework.authtoken.models import Token
+        Token.objects.create(user=instance)
+
+
+
 
 class Customers(model.Model):
     customer_id = model.AutoField(primary_key=True)
